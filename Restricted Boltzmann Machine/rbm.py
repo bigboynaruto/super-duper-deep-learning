@@ -5,14 +5,14 @@ from tqdm import tqdm
 class RBM:
 	def __init__(self, nv, nh):
 		# weights
-		self.W = np.random.randn(nv, nh)
+		self.W = np.zeros(shape=(nv, nh))
 
 		# biases
-		self.a = np.random.randn(1, nh)
-		self.b = np.random.randn(1, nv)
+		self.a = np.zeros(shape=(1, nh))
+		self.b = np.zeros(shape=(1, nv))
 
 	def __sample_uniform(self, u):
-		return (np.random.rand(*u.shape) < u) * 1
+		return (np.random.rand(*u.shape) <= u) * 1
 
 	def __sample_vh(self, x):
 		y = np.dot(x, self.W) + np.repeat(self.a, len(x), axis=0)
@@ -41,7 +41,7 @@ class RBM:
 				pbar = data
 
 			for x in pbar:
-				x_valid = (x == 0) | (x == 1)
+				x_valid = (x >= 0) & (x <= 1)
 
 				x0,xk = x,x
 				p0 = vh(x0)
@@ -67,7 +67,19 @@ class RBM:
 		hv = self.__sample_hv
 		vh = self.__sample_vh
 
-		x_valid = (x == 0) | (x == 1)
+		x_valid = (x >= 0) & (x <= 1)
+		res = hv(sample_uniform(vh(x)))
+
+		loss = np.mean(np.abs(x[x_valid] - res[x_valid]))
+
+		return res,loss
+
+	def predict_binary(self, x):
+		sample_uniform = self.__sample_uniform
+		hv = self.__sample_hv
+		vh = self.__sample_vh
+
+		x_valid = (x >= 0) & (x <= 1)
 		res = sample_uniform(hv(sample_uniform(vh(x))))
 
 		loss = np.mean(np.abs(x[x_valid] - res[x_valid]))
