@@ -1,12 +1,11 @@
 from layers import RNNLayer
-from nnutils import quadratic_loss, simple_grad 
+from nnutils import quadratic_loss 
 from functools import reduce
 
 class RNN:
-    def __init__(self, loss_function=quadratic_loss, grad_function=simple_grad):
+    def __init__(self, loss_function=quadratic_loss):
         self.layers = []
         self._loss_function = loss_function or quadratic_loss
-        self._grad_function = grad_function or simple_grad
 
     def add_layer(self, layer:RNNLayer):
         self.layers.append(layer)
@@ -24,7 +23,7 @@ class RNN:
                 total_loss += loss
 
                 for output,y in reversed(list(zip(outputs, Y))):
-                    error = self.grad(y, output)
+                    error = output - y
                     reduce(lambda error,layer: layer.backward(error), reversed(self.layers), error)
 
                 for layer in self.layers:
@@ -53,9 +52,6 @@ class RNN:
             outputs.append(output)
 
         return outputs
-    
-    def grad(self, y, y_hat):
-        return self._grad_function(y, y_hat)
 
     def loss(self, y, y_hat):
         return self._loss_function(y, y_hat)

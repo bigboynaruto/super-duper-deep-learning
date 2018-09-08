@@ -1,15 +1,22 @@
 import numpy as np
 
 def sigmoid(x): 
-    return 1. / (1 + np.exp(-x))
+    x = np.clip(x, -500, 500)
+    return 1 / (1 + np.exp(-x))
 
-def dsigmoid(s): 
+def dsigmoid(s, activated=True): 
+    return dsigmoid_activated(sigmoid(s))
+
+def dsigmoid_activated(s):
     return s * (1 - s)
 
 def tanh(x):
     return np.tanh(x)
 
 def dtanh(s):
+    return dtanh_activated(tanh(s))
+
+def dtanh_activated(s):
     return 1 - s**2
 
 def softmax(x):
@@ -27,9 +34,6 @@ def cross_entropy(y, y_hat):
 
 def quadratic_loss(y, y_hat):
     return np.sum(np.subtract(y_hat, y)**2) / len(y_hat)
-
-def simple_grad(y, y_hat):
-    return 2 * np.subtract(y_hat, y)
 
 def rand_range(low, high, *args): 
     return np.random.rand(*args) * (high - low) + low

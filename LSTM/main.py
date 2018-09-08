@@ -10,7 +10,8 @@ def main():
     X_train = [[[1,0,0]], [[0,1,0]], [[0,0,1]]]
     Y_train = [[[0,1,0]], [[0,0,1]], [[1,0,0]]]
     
-    rnn.train(X_train, Y_train, epochs=1000)
+    epochs = 1000
+    rnn.train(X_train, Y_train, epochs=epochs)
     for p,y in zip(rnn.predict(X_train), Y_train):
         _p = np.zeros_like(p).astype(int)
         _p[:, np.argmax(p)] = 1

@@ -1,5 +1,5 @@
 import numpy as np
-from nnutils import rand_range, tanh, sigmoid, dtanh, dsigmoid
+from nnutils import rand_range, tanh, sigmoid, dtanh_activated, dsigmoid_activated
 
 class RNNLayer:
     def __init__(self, input_size, output_size):
@@ -49,10 +49,10 @@ class _LSTMCell(RNNLayer):
 
     def backward(self, dh_t_1, dc_t_1):
         dc = self.o * dh_t_1 + dc_t_1
-        di = self.a * dc * dsigmoid(self.i) 
-        df = self.c_t_1 * dc * dsigmoid(self.f)
-        do = self.c * dh_t_1 * dsigmoid(self.o) 
-        da = self.i * dc * dtanh(self.a)
+        di = self.a * dc * dsigmoid_activated(self.i) 
+        df = self.c_t_1 * dc * dsigmoid_activated(self.f)
+        do = self.c * dh_t_1 * dsigmoid_activated(self.o) 
+        da = self.i * dc * dtanh_activated(self.a)
 
         self.lstm.dWi += np.dot(self.X.T, di)
         self.lstm.dWf += np.dot(self.X.T, df)
