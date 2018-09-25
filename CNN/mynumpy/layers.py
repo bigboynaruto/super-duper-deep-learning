@@ -1,5 +1,5 @@
-from nnutils import *
-from nnutils import _get_conv_output_shape2d
+from mynumpy.nnutils import *
+from mynumpy.nnutils import _get_conv_output_shape2d
 
 def _get_activation_derivative_from_name(name):
     name = name or 'none'

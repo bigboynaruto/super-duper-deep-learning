@@ -1,6 +1,6 @@
-from mynumpy.cnn import CNN, OneHotEncoder
-from mynumpy.layers import *
-import tensorflow as tf
+from mytensorflow.cnn import CNN, OneHotEncoder
+from mytensorflow.layers import *
+from mynumpy.nnutils import mean_squared_error as mse
 
 def main():
     # load datasets
@@ -14,7 +14,7 @@ def main():
     # X_test = [np.subtract(x, np.mean(x)) / np.std(x) for x in X_test]
 
     # take subset of datasets
-    train_size, test_size = 50, 20
+    train_size, test_size = 10000, 1000
     X_train = X_train[:train_size]
     Y_train = Y_train[:train_size]
     X_test = X_test[:test_size]
@@ -57,15 +57,18 @@ def main():
     print(cnn.output_shape)
 
     # train
-    epochs = 30
-    cnn.train(X_train, Y_train_encoded, epochs=epochs, learning_rate=0.1, verbosity=2)
+    epochs = 10
+    cnn.train(X_train, Y_train_encoded, epochs=epochs, batch_size=32, learning_rate=0.1, verbosity=2)
 
+    # make prediction
     prediction = np.reshape(cnn.predict(X_test), (test_size,-1))  # np.reshape(cnn.predict(X_test), Y_test.shape)
     prediction_rounded = np.reshape(np.round(prediction), (test_size, -1))
-    print('Test loss        : %f' % (mean_squared_error(prediction, Y_test_encoded)))
-    print('Test loss rounded: %f' % (mean_squared_error(prediction_rounded, Y_test_encoded)))
+
+    print('Test loss        : %f' % (mse(prediction, Y_test_encoded)))
+    print('Rounded test loss: %f' % (mse(prediction_rounded, Y_test_encoded)))
+
     total_ok = 0
-    predict_table = np.zeros(shape=(11, 10))
+    predict_table = np.zeros(shape=(11,10))
     for p, p_rounded, ye, y in zip(prediction, prediction_rounded, Y_test_encoded, Y_test):
         enc = encoder.decode(p_rounded, -1)
         ok = enc == y
@@ -74,16 +77,13 @@ def main():
             total_ok += 1
 
     print('Test accuracy: %f' % (total_ok / test_size))
-
+    
     print('p\y 0   1   2   3   4   5   6   7   8   9')
     for i in range(11):
         print('?' if i == 10 else i, end=' ')
         for k in predict_table[i, :]:
             print('%3d' % k, end=' ')
         print('')
-
-    print('Test accuracy: %f' % (total_ok / test_size))
-
 
 if __name__ == '__main__':
     main()
