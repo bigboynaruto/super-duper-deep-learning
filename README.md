@@ -1,2 +1,2 @@
-# Super Duper * Learning
-Some Deep/Machine/What-else Learning algorithms.
+# Super Duper Machine Learning
+Some Machine Learning algorithms.
